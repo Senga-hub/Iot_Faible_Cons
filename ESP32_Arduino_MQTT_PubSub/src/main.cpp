@@ -6,7 +6,7 @@
  It requires the Adafruit MQTT library and the WiFi library for ESP32.
 
  Make sure to replace WLAN_SSID, WLAN_PASS, MQTT_USERNAME, and MQTT_KEY with your actual WiFi and Adafruit IO credentials.
- 
+
  The code sets up a WiFi connection, connects to the MQTT server, and publishes data from a photocell sensor while subscribing to a LED feed to control an LED based on received commands.
  The photocell value is incremented and published every loop iteration, while the LED feed is checked for incoming messages to control the LED state.
 

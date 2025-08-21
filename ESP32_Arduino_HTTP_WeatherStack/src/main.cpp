@@ -3,12 +3,12 @@
 // fetches weather data from the WeatherStack API, and displays it on the Serial Monitor.
 // It uses the ArduinoJson library to parse the JSON response from the API.
 #include <Arduino.h>
-#include <WiFi.h>
-#include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <HTTPClient.h>
+#include <WiFi.h>
 
 #define WEATHERSTACK_API_KEY "MY_API_KEY"
-const char* ssid     = "WiFiHostpot";
+const char* ssid = "WiFiHostpot";
 const char* password = "WiFiPassword";
 
 void setup() {
@@ -36,9 +36,8 @@ void setup() {
 
 void loop() {
     // wait for WiFi connection
-    if((WiFi.status() == WL_CONNECTED)) {
+    if ((WiFi.status() == WL_CONNECTED)) {
         HTTPClient http;
-
 
         Serial.print("[HTTP] begin...\n");
         String url = String("http://api.weatherstack.com/current?access_key=") + WEATHERSTACK_API_KEY + "&query=Paris";
@@ -49,18 +48,18 @@ void loop() {
         int httpCode = http.GET();
 
         // httpCode will be negative on error
-        if(httpCode == HTTP_CODE_OK) {
-              String payload = http.getString();
-              Serial.println(payload);
+        if (httpCode == HTTP_CODE_OK) {
+            String payload = http.getString();
+            Serial.println(payload);
 
-              // Convert to JSON
-              JsonDocument doc;
-              deserializeJson(doc, payload);
+            // Convert to JSON
+            JsonDocument doc;
+            deserializeJson(doc, payload);
 
-              // Read and display values
-              String temp = doc["current"]["temperature"];
-              String desc = doc["current"]["weather_descriptions"][0];
-              Serial.println("Temperature: "+temp+"*C, description: "+desc);
+            // Read and display values
+            String temp = doc["current"]["temperature"];
+            String desc = doc["current"]["weather_descriptions"][0];
+            Serial.println("Temperature: " + temp + "*C, description: " + desc);
         } else {
             Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
