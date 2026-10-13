@@ -8,9 +8,8 @@
 #include <WiFi.h>
 
 #define CITY "Paris" 
-
-const char* ssid = "ENIGMA 9003";
-const char* password = "%9hB3311";
+const char* ssid = "iPhone_de_EM";
+const char* password = "toto123456789";
 
 void setup() {
     Serial.begin(115200);
@@ -57,11 +56,9 @@ void loop() {
             JsonDocument doc;
             DeserializationError err = deserializeJson(doc, payload);
             if (err) {
-                Serial.printf("JSON error: %s
-", err.c_str());
+                Serial.printf("JSON error: %s", err.c_str());
             } else if (doc["success"] == false) {
-                Serial.printf("API error: %s
-", doc["error"]["info"] | "unknown");
+                Serial.printf("API error: %s", doc["error"]["info"] | "unknown");
             } else {
                 // Read and display values
                 const char* city = doc["location"]["name"];
@@ -70,14 +67,10 @@ void loop() {
                 float wind = doc["current"]["wind_speed"];  // km/h
 
                 Serial.println("-----------------------------");
-                Serial.printf("City        : %s
-", city);
-                Serial.printf("Time        : %s
-", localtime);
-                Serial.printf("Temperature : %.1f *C
-", temp);
-                Serial.printf("Wind speed  : %.1f km/h
-", wind);
+                Serial.printf("City        : %s", city);
+                Serial.printf("Time        : %s", localtime);
+                Serial.printf("Temperature : %.1f *C", temp);
+                Serial.printf("Wind speed  : %.1f km/h", wind);
                 Serial.println("-----------------------------");
             }
         } else {
