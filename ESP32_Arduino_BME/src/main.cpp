@@ -1,82 +1,51 @@
-
-/***************************************************************************
-  This is a library for the BME680 gas, humidity, temperature & pressure sensor
-  Designed specifically to work with the Adafruit BME680 Breakout
-  ----> http://www.adafruit.com/products/3660
-  These sensors use I2C or SPI to communicate, 2 or 4 pins are required to interface.
-  Adafruit invests time and resources providing this open source code, please support Adafruit and open-source hardware by purchasing
-products from Adafruit!
-  Written by Limor Fried & Kevin Townsend for Adafruit Industries.
-  BSD license, all text above must be included in any redistribution
- ***************************************************************************/
-#include <Adafruit_Sensor.h>
 #include <Arduino.h>
 #include <Wire.h>
-
+#include <LiquidCrystal_I2C.h>
+#include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
 
-#define SEALEVELPRESSURE_HPA (1013.25)
-
-/*******************
- * Choose between I2C or SPI
- */
-#define USE_I2C  // Comment this line to use SPI instead of I2C
-
-#ifdef USE_I2C
-// Connect "SCL" pin on the BME680 with GPIO 22 on the ESP32
-// Connect "SDA" pin on the BME680 with GPIO 21 on the ESP32
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 Adafruit_BME680 bme;
-#else
-#define BME_SCK 14   // Connect "SCL" pin on the BME680 with GPIO 14 on the ESP32
-#define BME_MISO 12  // Connect "SDO" pin on the BME680 with GPIO 12 on the ESP32
-#define BME_MOSI 13  // Connect "SDA" pin on the BME680 with GPIO 13 on the ESP32
-#define BME_CS 15    // Connect "CS"  pin on the BME680 with GPIO 15 on the ESP32
-Adafruit_BME680 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK);
-#endif
 
 void setup() {
-    Serial.begin(115200);
-    while (!Serial);
-    Serial.println(F("BME680 test"));
+  Serial.begin(115200);
+  Wire.begin(21, 22);
+  lcd.init();
+  lcd.backlight();
 
-    if (!bme.begin()) {
-        Serial.println("Could not find a valid BME680 sensor, check wiring!");
-        while (1);
-    }
+  if (!bme.begin(0x77)) {
+    Serial.println("[Binome 1 - MANZANAS & AGNES] BME680 introuvable");
+    lcd.print("BME680 absent");
+    while (1);
+  }
 
-    // Set up oversampling and filter initialization
-    bme.setTemperatureOversampling(BME680_OS_8X);
-    bme.setHumidityOversampling(BME680_OS_2X);
-    bme.setPressureOversampling(BME680_OS_4X);
-    bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
-    bme.setGasHeater(320, 150);  // 320*C for 150 ms
+  bme.setTemperatureOversampling(BME680_OS_8X);
+  bme.setHumidityOversampling(BME680_OS_2X);
+  bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
+  bme.setGasHeater(0, 0);
 }
 
 void loop() {
-    if (!bme.performReading()) {
-        Serial.println("Failed to perform reading :(");
-        return;
-    }
-    Serial.print("Temperature = ");
-    Serial.print(bme.temperature);
-    Serial.println(" *C");
+  if (!bme.performReading()) {
+    Serial.println("[Binome 1 - MANZANAS & AGNES] Erreur de mesure");
+    return;
+  }
 
-    Serial.print("Pressure = ");
-    Serial.print(bme.pressure / 100.0);
-    Serial.println(" hPa");
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Temp: ");
+  lcd.print(bme.temperature);
+  lcd.print(" C");
+  lcd.setCursor(0, 1);
+  lcd.print("Hum: ");
+  lcd.print(bme.humidity);
+  lcd.print(" %");
 
-    Serial.print("Humidity = ");
-    Serial.print(bme.humidity);
-    Serial.println(" %");
+  Serial.print("[Binome 1 - MANZANAS & AGNES] Temp: ");
+  Serial.print(bme.temperature);
+  Serial.print(" C | Hum: ");
+  Serial.print(bme.humidity);
+  Serial.println(" %");
 
-    Serial.print("Gas = ");
-    Serial.print(bme.gas_resistance / 1000.0);
-    Serial.println(" KOhms");
-
-    Serial.print("Approx. Altitude = ");
-    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-    Serial.println(" m");
-
-    Serial.println();
-    delay(2000);
+  delay(2000);
 }
