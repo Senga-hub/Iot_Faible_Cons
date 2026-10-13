@@ -7,9 +7,10 @@
 #include <HTTPClient.h>
 #include <WiFi.h>
 
-#define WEATHERSTACK_API_KEY "MY_API_KEY"
-const char* ssid = "WiFiHostpot";
-const char* password = "WiFiPassword";
+#define CITY "Paris" 
+
+const char* ssid = "ENIGMA 9003";
+const char* password = "%9hB3311";
 
 void setup() {
     Serial.begin(115200);
@@ -40,7 +41,7 @@ void loop() {
         HTTPClient http;
 
         Serial.print("[HTTP] begin...\n");
-        String url = String("http://api.weatherstack.com/current?access_key=") + WEATHERSTACK_API_KEY + "&query=Paris";
+        String url = String("http://api.weatherstack.com/current?access_key=") + WEATHERSTACK_API_KEY + "&query=" CITY;
         http.begin(url);
 
         Serial.print("[HTTP] GET...\n");
@@ -54,12 +55,31 @@ void loop() {
 
             // Convert to JSON
             JsonDocument doc;
-            deserializeJson(doc, payload);
+            DeserializationError err = deserializeJson(doc, payload);
+            if (err) {
+                Serial.printf("JSON error: %s
+", err.c_str());
+            } else if (doc["success"] == false) {
+                Serial.printf("API error: %s
+", doc["error"]["info"] | "unknown");
+            } else {
+                // Read and display values
+                const char* city = doc["location"]["name"];
+                const char* localtime = doc["location"]["localtime"];  // "YYYY-MM-DD HH:MM"
+                float temp = doc["current"]["temperature"];
+                float wind = doc["current"]["wind_speed"];  // km/h
 
-            // Read and display values
-            String temp = doc["current"]["temperature"];
-            String desc = doc["current"]["weather_descriptions"][0];
-            Serial.println("Temperature: " + temp + "*C, description: " + desc);
+                Serial.println("-----------------------------");
+                Serial.printf("City        : %s
+", city);
+                Serial.printf("Time        : %s
+", localtime);
+                Serial.printf("Temperature : %.1f *C
+", temp);
+                Serial.printf("Wind speed  : %.1f km/h
+", wind);
+                Serial.println("-----------------------------");
+            }
         } else {
             Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
