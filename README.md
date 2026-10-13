@@ -1,4 +1,4 @@
-# esp32_examples
+# Iot_Faible_Cons
 
 This repository contains a collection of example projects for the ESP32 microcontroller, using either the Arduino framework or ESP-IDF. These examples are primarily used in courses at ESIEA, especially in the Embedded Systems major.
 
